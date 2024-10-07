@@ -3,7 +3,6 @@ import 'package:easy_permission_validator/easy_permission_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:voopoler/views/module/home.dart';
 
 import 'views/module/auth/signin.dart';
 

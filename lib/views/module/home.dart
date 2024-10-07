@@ -18,6 +18,7 @@ class _HomeViewState extends State<HomeView> {
       initialRoute: 'home',
       onUnknownRoute: (_) {
         const HomeView();
+        return null;
       },
       routes: {
         'home': (context) => const HomeView(),
