@@ -1,7 +1,8 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:telephony/telephony.dart';
 
-class AuthController {
+class SignUpController {
   signUp(
       {required String email,
       required String phone,
@@ -9,15 +10,41 @@ class AuthController {
     return null;
   }
 
-  signIn(email, password) async {}
-  Future<String> sendOTP(BuildContext context, {required String mobile}) async {
-    // final response = await http.post(
-    //   Uri.parse('https://your-backend-url/send-otp'),
-    //   body: {'mobile': mobile},
-    // );
-    // if (response.statusCode == 200) {
-    return '321231';
-    // 32
+  Future<int> generateOTP(int min, int max) async {
+    final Random random = Random();
+    int randomNumber = min + (random.nextInt(max));
+    return randomNumber;
+  }
+
+  // Future<bool> _sendSMS(String message, List<String> recipents) async {
+  //   await sendSMS(message: message, recipients: recipents)
+  //       .catchError((onError) {
+  //     print(onError.toString());
+  //   });
+  //   return true;
+  // }
+
+  Future<dynamic> sendOTP(BuildContext context,
+      {required String mobile}) async {
+    final Telephony telephony = Telephony.instance;
+    int otpNumber = await generateOTP(000000, 999999);
+    String message =
+        "Your OTP Code ${otpNumber.toString()}. Please Don't share this code with other people!";
+
+    return await telephony.sendSms(
+      to: mobile,
+      message: message,
+      statusListener: (SendStatus status) {
+        switch (status) {
+          case SendStatus.SENT:
+            return otpNumber;
+          case SendStatus.DELIVERED:
+            return 'Waiting send SMS...';
+          default:
+            return 'OTP failed to Send';
+        }
+      },
+    );
   }
 
   signOut({required String key}) async {}

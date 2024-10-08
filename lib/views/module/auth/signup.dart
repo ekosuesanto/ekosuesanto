@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:telephony/telephony.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:glossy/glossy.dart';
@@ -9,6 +9,10 @@ import 'package:voopoler/controllers/signup_controller.dart';
 import 'package:voopoler/views/module/auth/forgot/otp.dart';
 
 import 'signin.dart';
+
+onBackgroundMessage(SmsMessage message) {
+  debugPrint("onBackgroundMessage called");
+}
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -27,7 +31,7 @@ class _SignUpState extends State<SignUp> {
   final _refreshButtonEnableVN = ValueNotifier(true);
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
-  final AuthController _authController = AuthController();
+  final SignUpController _authController = SignUpController();
   final Shader linearGradient = const LinearGradient(
     colors: <Color>[Color(0xfffcb13c), Color(0xffd66dfe)],
   ).createShader(const Rect.fromLTWH(10.0, 10.0, 200.0, 30.0));
@@ -35,6 +39,44 @@ class _SignUpState extends State<SignUp> {
   var _inputCode = '';
   Timer? _refreshTimer;
   bool _isLoading = false;
+  late String _message;
+  final telephony = Telephony.instance;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initPlatformState();
+  }
+
+  onMessage(SmsMessage message) async {
+    setState(() {
+      _message = message.body!;
+    });
+  }
+
+  onSendStatus(SendStatus status) {
+    setState(() {
+      _message = status == SendStatus.SENT ? "sent" : "delivered";
+    });
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+
+    final bool? result = await telephony.requestPhoneAndSmsPermissions;
+
+    if (result!) {
+      telephony.listenIncomingSms(
+          onNewMessage: onMessage, onBackgroundMessage: onBackgroundMessage);
+    }
+
+    if (!mounted) return;
+  }
+
   @override
   void dispose() {
     _localCaptchaController.dispose();
@@ -411,7 +453,7 @@ class _SignUpState extends State<SignUp> {
                                                 )
                                                     .then((result) async {
                                                   if (result == null) {
-                                                    String getOTP =
+                                                    dynamic getOTP =
                                                         await _authController
                                                             .sendOTP(
                                                       context,
@@ -419,8 +461,10 @@ class _SignUpState extends State<SignUp> {
                                                           _phoneNumberController
                                                               .text,
                                                     );
-                                                    print(getOTP);
-                                                    if (getOTP.isNotEmpty) {
+                                                    print(getOTP.toString());
+                                                    print(getOTP.runtimeType);
+                                                    if (getOTP.runtimeType ==
+                                                        int) {
                                                       if (!context.mounted) {
                                                         return;
                                                       }
@@ -439,19 +483,23 @@ class _SignUpState extends State<SignUp> {
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               OtpViews(
-                                                            resendCode: getOTP,
+                                                            getOTP,
+                                                            _phoneNumberController
+                                                                .text,
                                                           ),
                                                         ),
                                                       );
                                                     } else {
+                                                      String msg =
+                                                          getOTP.toString();
                                                       if (!context.mounted) {
                                                         return;
                                                       }
                                                       _messangerKey.currentState
                                                           ?.showSnackBar(
-                                                        const SnackBar(
+                                                        SnackBar(
                                                           content: Text(
-                                                            'Failed to send OTP',
+                                                            msg,
                                                           ),
                                                         ),
                                                       );
