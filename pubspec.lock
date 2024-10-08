@@ -326,7 +326,7 @@ packages:
     source: hosted
     version: "1.2.0"
   telephony:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       path: "."
       ref: develop
