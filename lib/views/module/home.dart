@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:voopoler/views/module/auth/forgot/otp.dart';
 import 'package:voopoler/views/module/auth/signin.dart';
 import 'package:voopoler/views/module/auth/signup.dart';
 
@@ -24,7 +23,6 @@ class _HomeViewState extends State<HomeView> {
         'home': (context) => const HomeView(),
         'signin': (context) => const SignIn(),
         'signup': (context) => const SignUp(),
-        'verify': (context) => const OtpViews(resendCode: ''),
       },
       home: const Scaffold(
         body: Center(

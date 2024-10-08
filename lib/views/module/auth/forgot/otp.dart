@@ -4,8 +4,10 @@ import 'package:otp_pin_field/otp_pin_field.dart';
 import '../signin.dart';
 
 class OtpViews extends StatefulWidget {
-  final String? resendCode;
-  const OtpViews({super.key, required this.resendCode});
+  final int resendCode;
+  final String mobile;
+
+  const OtpViews(this.resendCode, this.mobile, {super.key});
 
   @override
   State<OtpViews> createState() => _OtpViewsState();
@@ -19,6 +21,7 @@ class _OtpViewsState extends State<OtpViews> {
   ).createShader(const Rect.fromLTWH(10.0, 10.0, 200.0, 30.0));
   @override
   Widget build(BuildContext context) {
+    print(widget.resendCode);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -128,7 +131,7 @@ class _OtpViewsState extends State<OtpViews> {
                                 autoFillEnable: false,
                                 textInputAction: TextInputAction.done,
                                 onSubmit: (text) {
-                                  if (widget.resendCode == text) {}
+                                  if (widget.resendCode.toString() == text) {}
                                 },
                                 onChange: (text) {
                                   print('Enter on change pin is $text');
@@ -257,7 +260,7 @@ class _OtpViewsState extends State<OtpViews> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  if (widget.resendCode ==
+                                  if (widget.resendCode.toString() ==
                                       _otpPinFieldController
                                           .currentState!.controller.text
                                           .toString()) {

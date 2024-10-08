@@ -43,7 +43,10 @@ dependencies:
   local_captcha: ^1.0.4
   otp_pin_field: ^1.2.9+1
   http: ^1.2.2
-
+  telephony:
+    git:
+      url: https://github.com/suhardik/s_telephony.git
+      ref: develop
 dev_dependencies:
   flutter_test:
     sdk: flutter
