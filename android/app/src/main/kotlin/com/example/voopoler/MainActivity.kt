@@ -1,35 +1,33 @@
 package com.example.voopoler
+import android.R
 import android.content.Context
-import io.flutter.embedding.android.FlutterActivity
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.FlutterEngineCache
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugins.GeneratedPluginRegistrant
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import android.content.BroadcastReceiver
+class MainActivity : AppCompatActivity() {
+    private val smsReceiver = SmsReceiver()
 
-class MainActivity : FlutterActivity() {
-    val REQUEST_CHANNEL = "add2app.io/request";
-    override fun provideFlutterEngine(context:Context): FlutterEngine? {
-        val flutterEngine = FlutterEngineCache.getInstance().get("my_engine_id")
-        return flutterEngine
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.main_activity)
+        registerReceiver(smsReceiver,
+            IntentFilter("android.provider.Telephony.SMS_RECEIVED")
+        )
     }
 
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        super.configureFlutterEngine(flutterEngine)
-        GeneratedPluginRegistrant.registerWith(flutterEngine)
-
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(smsReceiver)
     }
 
-    fun registerFlutterCallbacks(flutterEngine: FlutterEngine) {
-        MethodChannel(
-            flutterEngine.getDartExecutor(),
-            REQUEST_CHANNEL
-        ).setMethodCallHandler { call, result ->
-            if (call.method.equals("getNativeMsg")) {
-                val nd = "Ola from Android"
-                result.success(nd)
-            } else {
-                result.notImplemented()
-            }
+}
+class SmsReceiver: BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if(intent?.action == "android.provider.Telephony.SMS_RECEIVED") { // it's best practice to verify intent action before performing any operation
+            Log.i("ReceiverApp", "SMS Received")
         }
     }
 }
